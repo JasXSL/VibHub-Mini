@@ -11,16 +11,16 @@
 
 namespace Configuration{
 
-    const char VH_VERSION[]         = "0.2.2";          // Software version
+    const char VH_VERSION[]         = "m0.0.1";          // Software version
     const char VH_HWVERSION[]       = "ESP32_2.1";      // Hardware type & version
-    const char WIFI_SSID[]          = "VibHub";         // Network SSID
+    const char WIFI_SSID[]          = "VibHub M";         // Network SSID
     const char DEFAULT_HOST[]       = "vibhub.io";      // Default socket host
     const int  DEFAULT_PORT         = 443;               // Default socket port
     const char API_URL[]            = "/socket.io/?transport=websocket";
     const char SETTINGS_FILE[]      = "/config.json";   // Default SPIFFS config file
 
     // Websockets
-    const int WEBSOCKET_RECONNECT_TIME = 3000;          // How long to wait after a connection failed
+    const uint16_t WEBSOCKET_RECONNECT_TIME = 3000;          // How long to wait after a connection failed
 
     // Status LED
     const uint8_t SLED_BRIGHTNESS   = 50;   // Status LED brightness, 0-255
@@ -29,37 +29,28 @@ namespace Configuration{
     const uint8_t PIN_SLED_R        = 14;   // GPIO pin for RGB (inverse, a PWM of 255 turns off)
     const uint8_t PIN_SLED_G        = 12;
     const uint8_t PIN_SLED_B        = 27;
-    const uint8_t PIN_SLED2_R       = 32;   // 2.1 only
-    const uint8_t PIN_SLED2_G       = 33;   // 2.1 only
-    const uint8_t PIN_SLED2_B       = 25;   // 2.1 only
-    const uint8_t PIN_CONFIG_BUTTON = 26;   // Configuration pin. Use a pull-up resistor
-    const uint8_t PIN_NSLEEP        = 2;    // Disables motor drivers when low
-    const uint8_t PIN_MOTOR_A_IN1   = 13;
-    const uint8_t PIN_MOTOR_A_IN2   = 15;
-    const uint8_t PIN_MOTOR_B_IN1   = 4;
-    const uint8_t PIN_MOTOR_B_IN2   = 16;
-    const uint8_t PIN_MOTOR_C_IN1   = 17;
-    const uint8_t PIN_MOTOR_C_IN2   = 5;
-    const uint8_t PIN_MOTOR_D_IN1   = 19;
-    const uint8_t PIN_MOTOR_D_IN2   = 18;
-    const uint8_t PIN_MOTOR_FAULT1  = 35;   // Currently unused
-    const uint8_t PIN_MOTOR_FAULT2  = 34;   // Currently unused
-    const uint8_t PIN_SDA           = 21;   // Currently unused
-    const uint8_t PIN_SCL           = 22;   // Currently unused
-    const uint8_t PIN_POWEROFF      = 23;   // Signal high turns off main power
+
+    const uint8_t PIN_CONFIG_BUTTON = 26;   // Configuration pin. Use internal pullup
+    const uint8_t PIN_MOTOR_A       = 13;
+    const uint8_t PIN_MOTOR_B       = 4;
+    const uint8_t PIN_POWEROFF      = 23;   // Writing LOW turns off
+    const uint8_t PIN_POWER_BUTTON  = 33;   // LOW when pressed. Has external pullup.
     
 
     // PWM
-    const int PWM_FREQ              = 12000; // PWM Frequency
-    const int PWM_RESOLUTION        = 8;     // PWM resolution
+    const uint16_t PWM_FREQ         = 12000; // PWM Frequency
+    const uint16_t PWM_RESOLUTION   = 8;     // PWM resolution
 
     // Button config
     const bool BUTTON_UP            = HIGH;  // Value when the button is not pressed
     const bool BUTTON_DOWN          = LOW;   // Value when the button IS pressed
-    const int BUTTON_HOLD_TIME      = 4000;  // Time before it enters config mode
+    const uint16_t BUTTON_HOLD_TIME = 4000;  // Time before it enters config mode
     const uint8_t BUTTON_DEBOUNCE   = 100;   // Debounce time
 
-
+    const bool PWR_BUTTON_UP        = HIGH;  // Power button not pressed
+    const bool PWR_BUTTON_DOWN      = LOW;  // Power button pressed
+    
+    
     // Global randomizer function
     // Returns a random value which can be min through and including max
     // min0 max3 would generate 0, 1, 2, or 3

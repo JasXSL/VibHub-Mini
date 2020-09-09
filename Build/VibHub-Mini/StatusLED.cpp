@@ -43,10 +43,6 @@ void StatusLED::initialize(){
     p_green.initialize(Configuration::PIN_SLED_G);
     p_blue.initialize(Configuration::PIN_SLED_B);
 
-    p2_red.initialize(Configuration::PIN_SLED2_R);
-    p2_green.initialize(Configuration::PIN_SLED2_G);
-    p2_blue.initialize(Configuration::PIN_SLED2_B);
-
     // Serial.println("Initialized StatusLED");
     setLed(OFF);
 
@@ -64,26 +60,6 @@ void StatusLED::setLed( uint8_t color ){
     p_green.setPWM(g);
     p_blue.setPWM(b);
 
-    p2_red.setPWM(r);
-    p2_green.setPWM(g);
-    p2_blue.setPWM(b);
-
-}
-
-void StatusLED::setLedColor( uint8_t led, uint16_t r, uint16_t g, uint16_t b ){
-    if (led&1)
-    {
-        p_red.setPWM(r);
-        p_green.setPWM(g);
-        p_blue.setPWM(b);
-    }
-    
-    if (led&2)
-    {
-        p2_red.setPWM(r);
-        p2_green.setPWM(g);
-        p2_blue.setPWM(b);
-    }
 }
 
 

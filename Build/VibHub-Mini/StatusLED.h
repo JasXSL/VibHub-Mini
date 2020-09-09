@@ -23,7 +23,6 @@ class StatusLED{
         bool ledTickerHigh;
         void setState( int state = STATE_BOOT );
         void setLed( uint8_t color  );
-        void setLedColor( uint8_t led, uint16_t r, uint16_t g, uint16_t b );
 
         void test();
         static void testTick( int color );
@@ -36,10 +35,6 @@ class StatusLED{
         Pwm p_red;
         Pwm p_green;
         Pwm p_blue;
-
-        Pwm p2_red;
-        Pwm p2_green;
-        Pwm p2_blue;
         
         uint8_t testColor;
 

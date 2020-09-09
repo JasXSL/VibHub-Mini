@@ -35,7 +35,7 @@ ConfigButton::ConfigButton( void ){
 void ConfigButton::setup(){
 
     //set wifireset pin as input
-    pinMode(Configuration::PIN_CONFIG_BUTTON, INPUT);
+    pinMode(Configuration::PIN_CONFIG_BUTTON, INPUT_PULLUP);
 
 }
 
