@@ -1,7 +1,6 @@
-# VibHub-ESP32
-Beefing up the HW of VibHub
+# VibHub-Mini
+This is the experimental 18650 version of VibHub with 2 stacked USB ports.
 
-This is the firmware for the ESP32 version.
 If you're looking for the API documentation, you can find that on the original VibHub client git: 
 https://github.com/JasXSL/VibHub-Client/wiki
 
