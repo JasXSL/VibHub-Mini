@@ -60,6 +60,9 @@ void StatusLED::setLed( uint8_t color ){
     p_green.setPWM(g);
     p_blue.setPWM(b);
 
+    // Todo: delete
+    //delay(1000);
+
 }
 
 
@@ -74,12 +77,14 @@ void StatusLED::flashingTick(int color){
 
 void StatusLED::setState( int state ){
 
+    Serial.printf("set State from %i to %i\n", programState, state);
+
     if( programState == state )
         return;
 
     programState = state;
 
-    Serial.printf("setState: %i\n", state);
+    
     
     ledTicker.detach();
     switch(state){
@@ -102,7 +107,7 @@ void StatusLED::setState( int state ){
             break;
         case STATE_SOCKET_ERR :
             setLed(YELLOW);
-            Serial.println(" - STATE_SOCKET_ERR half green");
+            Serial.println(" - STATE_SOCKET_ERR yellow");
             break;
         case STATE_RUNNING :
             setLed(vhWifi.connected ? GREEN : BLUE);
@@ -113,6 +118,7 @@ void StatusLED::setState( int state ){
             Serial.println(" - STATE_BOOT half blue");
 
     }
+
 
 }
 

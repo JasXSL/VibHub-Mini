@@ -26,13 +26,13 @@ namespace Configuration{
     const uint8_t SLED_BRIGHTNESS   = 50;   // Status LED brightness, 0-255
 
     // ESP32 2.0a/2.1 Board GPIO Assignments
-    const uint8_t PIN_SLED_R        = 14;   // GPIO pin for RGB (inverse, a PWM of 255 turns off)
+    const uint8_t PIN_SLED_R        = 27;   // 14 (got swapped on first board)   // GPIO pin for RGB (inverse, a PWM of 255 turns off)
     const uint8_t PIN_SLED_G        = 12;
-    const uint8_t PIN_SLED_B        = 27;
+    const uint8_t PIN_SLED_B        = 14;   // 27 (got swapped on first board)
 
+    const uint8_t NUM_MOTORS = 2;
+    const uint8_t PIN_MOTORS[NUM_MOTORS] = {13, 4};
     const uint8_t PIN_CONFIG_BUTTON = 26;   // Configuration pin. Use internal pullup
-    const uint8_t PIN_MOTOR_A       = 13;
-    const uint8_t PIN_MOTOR_B       = 4;
     const uint8_t PIN_POWEROFF      = 23;   // Writing LOW turns off
     const uint8_t PIN_POWER_BUTTON  = 33;   // LOW when pressed. Has external pullup.
     

@@ -21,26 +21,40 @@ and socket.io-client: https://github.com/Kadah/socket.io-client
 #include "ApiClient.h"
 #include "StatusLED.h"
 #include "Pwm.h"
+#include "OnOffController.h"
 
 
 // Program begins
 void setup() {
 
-	// Serial setup
+    onOffController.setup();
+    pinMode(22, OUTPUT);
+    digitalWrite(22, HIGH);
+
+    // Serial setup
     Serial.begin(115200);
     //Serial.setDebugOutput(true);
-    delay(1000);
+
+    statusLED.initialize();
+    
+    delay(2000);
+
+    // Set LED state
+    Serial.println("Setting state BOOT");
+    statusLED.setState(StatusLED::STATE_BOOT);
+
+	
     Serial.println("\nStarting...");
 
     Serial.printf("Board Version: %s\n", Configuration::VH_HWVERSION);
     Serial.printf("Firmware Version: %s\n", Configuration::VH_VERSION);
 
-    // Set LED state
-    statusLED.initialize();
-    statusLED.setState(StatusLED::STATE_BOOT);
     
-    
+
     configButton.setup();
+
+
+
     apiClient.setup();
    
     // Reset config and wifi if config button is held on boot
@@ -115,6 +129,7 @@ void setup() {
 // Main program lööp
 void loop() {
 
+    onOffController.loop();
     apiClient.loop();
     configButton.loop();
     userSettings.loop();

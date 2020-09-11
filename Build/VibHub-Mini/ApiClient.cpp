@@ -23,8 +23,8 @@ ApiClient::ApiClient(void) :
 
 void ApiClient::setup(){
 
-	motors.push_back(Motor(Configuration::PIN_MOTOR_D_IN1, Configuration::PIN_MOTOR_D_IN2));
-	motors.push_back(Motor(Configuration::PIN_MOTOR_C_IN1, Configuration::PIN_MOTOR_C_IN2));
+    for( uint8_t i = 0; i < Configuration::NUM_MOTORS; ++i )
+	    motors.push_back(Motor(Configuration::PIN_MOTORS[i]));
 
     // Attach event handlers
     // For simplicity, events are always attached regardless
@@ -34,13 +34,13 @@ void ApiClient::setup(){
     _socket.on("p", std::bind(&ApiClient::event_p, this, _1, _2));
     _socket.on("ota", std::bind(&ApiClient::event_ota, this, _1, _2));
 
-    pinMode(Configuration::PIN_NSLEEP, OUTPUT);
+	resetMotors();
 
 }
 
 bool ApiClient::motorRunning(){
     uint8_t i;
-    for( i = 0; i < 4; ++i ){
+    for( i = 0; i < Configuration::NUM_MOTORS; ++i ){
         if( motors[i].running() )
             return true;
     }
@@ -70,15 +70,16 @@ void ApiClient::disconnect(){
     _running = false; // Don't run loop (will cause reconnect)
     _socket.disconnect();
 
+
 }
 
 void ApiClient::event_connect( const char * payload, size_t length ){
 
+	resetMotors();
     Serial.println("ApiClient::event_connect");
     _connected = true;
     _socket.emit("id", ("\"" + (String)userSettings.deviceid + "\"").c_str());
     statusLED.setState(StatusLED::STATE_RUNNING);
-    output_enable();
 
     // KC: Force test OTA
     // fwUpdate.start("0.0.1/Board_Test_32.bin", "ba23a5ca48356df4aac57df6a2634dbe");
@@ -91,7 +92,8 @@ void ApiClient::event_disconnect( const char * payload, size_t length ){
         Serial.println("ApiClient::event_disconnect");
         statusLED.setState(StatusLED::STATE_SOCKET_ERR);
         _connected = false;
-        output_disable();
+        
+        resetMotors();
 
     }
 
@@ -141,14 +143,14 @@ void ApiClient::event_vib( const char * payload, size_t length ){
         //serializeJson(j, Serial);
         //Serial.println();
 
-        bool mo[4] = {true, true, true, true};
+        bool mo[Configuration::NUM_MOTORS] = {true};
         
         if( j.containsKey("port") ){
 
             int port = j["port"];
             if( port > 0 ){
 
-                for( int i = 0; i<4; ++i )
+                for( int i = 0; i<Configuration::NUM_MOTORS; ++i )
                     mo[i] = port&(1<<i);
 
             }
@@ -159,7 +161,7 @@ void ApiClient::event_vib( const char * payload, size_t length ){
         if( j.containsKey("repeats") )
             repeats = j["repeats"];
 
-        for( byte n=0; n<4; ++n ){
+        for( byte n=0; n < Configuration::NUM_MOTORS; ++n ){
 
             if( mo[n] )
                 motors[n].loadProgram(j["stages"], repeats);
@@ -174,22 +176,18 @@ void ApiClient::event_vib( const char * payload, size_t length ){
 
 void ApiClient::event_p( const char * payload, size_t length ){
 
-    unsigned long int data = strtoul(payload, 0, 16);
-    uint8_t vibArray[4];
-    vibArray[0] = (int)((data & 0xFF000000) >> 24 );
-    vibArray[1] = (int)((data & 0x00FF0000) >> 16 );
-    vibArray[2] = (int)((data & 0x0000FF00) >> 8 );
-    vibArray[3] = (int)((data & 0X000000FF));
-    Serial.printf("ApiClient::event_p - v0: %u, v1: %u, v2: %u, v3: %u\n", vibArray[0], vibArray[1], vibArray[2], vibArray[3]);
+    uint32_t data = strtoul(payload, 0, 16);
+    uint8_t vibArray[Configuration::NUM_MOTORS];
+    for( uint8_t i = 0; i < Configuration::NUM_MOTORS; ++i )
+        vibArray[i] = (data>>(i*8))&0xFF;
+
+    Serial.printf("ApiClient::event_p - 0x%08x\n", data);
 
     userSettings.resetSleepTimer();
 
     int i;
-    for( i = 0; i < 4; ++i ){
-
+    for( i = 0; i < Configuration::NUM_MOTORS; ++i )
         setFlatPWM(i, vibArray[i]);
-
-    }
 
 }
 
@@ -215,6 +213,12 @@ void ApiClient::setFlatPWM( uint8_t motor, uint8_t value = 0 ){
     motors[motor].setPWM(value);
 }
 
+void ApiClient::resetMotors(){
+    // Reset the motors
+    for( uint8_t i = 0; i < Configuration::NUM_MOTORS; ++i )
+        setFlatPWM(i);
+
+}
 
 void ApiClient::loop() {
 
@@ -222,19 +226,11 @@ void ApiClient::loop() {
 
         _socket.loop();
 
-        for( int i=0; i<motors.size(); ++i )
+        for( int i=0; i<Configuration::NUM_MOTORS; ++i )
             motors[i].update();
 
     }
 
-}
-
-// Enables/Disables motor drivers (sets DRV8833's nSLEEP pin high/low)
-void ApiClient::output_enable(){
-    digitalWrite(Configuration::PIN_NSLEEP, HIGH);
-}
-void ApiClient::output_disable(){  
-    digitalWrite(Configuration::PIN_NSLEEP, LOW);
 }
 
 
