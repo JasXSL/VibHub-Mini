@@ -12,8 +12,33 @@
 #include "UserSettings.h"
 #include "ApiClient.h"
 
-uint32_t time_pressed;
 OnOffController::OnOffController( void ){}
+
+uint32_t OnOffController::time_released = 0;
+
+void IRAM_ATTR OnOffController::onInterrupt(){
+
+	const uint32_t ms = millis();
+	const bool pressed = digitalRead(Configuration::PIN_POWER_BUTTON) == Configuration::PWR_BUTTON_DOWN;
+	
+	if( !time_released ){
+
+		if( !pressed && ms > 500 )
+			time_released = ms;
+		
+		return;
+
+	}
+	// Turn off after 100ms debounce after releasing the button
+	if( pressed && ms-time_released > 1000 ){
+
+		detachInterrupt(digitalPinToInterrupt(Configuration::PIN_POWER_BUTTON));
+		digitalWrite(Configuration::PIN_POWEROFF, LOW);
+
+	}
+	
+
+}
 
 void OnOffController::setup(){
 
@@ -21,33 +46,10 @@ void OnOffController::setup(){
     pinMode(Configuration::PIN_POWEROFF, OUTPUT);
 	digitalWrite(Configuration::PIN_POWEROFF, HIGH);
 
-    pinMode(Configuration::PIN_POWER_BUTTON, INPUT);
-
-
-}
-
-
-void OnOffController::loop(){
-
-	const bool pressed = digitalRead(Configuration::PIN_POWER_BUTTON) == Configuration::PWR_BUTTON_DOWN;
-	// If not released, we're holding it because we booted
-	if( !time_released ){
-		if( !pressed )
-			time_released = millis();
-		return;
-	}
-	// It has been released after boot, if not pressed, do nothing
-	if( !pressed )
-		return;
-	// Debounce
-	if( millis()-time_released < 100 )
-		return;
-
-	// Turn off
-	// Todo: check this
-	//digitalWrite(Configuration::PIN_POWEROFF, LOW);
+    pinMode(Configuration::PIN_POWER_BUTTON, INPUT_PULLUP);
+	attachInterrupt(digitalPinToInterrupt(Configuration::PIN_POWER_BUTTON), onInterrupt, CHANGE);
 
 }
 
 
-OnOffController onOffController = OnOffController();
+

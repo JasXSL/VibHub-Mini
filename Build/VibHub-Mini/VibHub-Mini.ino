@@ -27,17 +27,16 @@ and socket.io-client: https://github.com/Kadah/socket.io-client
 // Program begins
 void setup() {
 
-    onOffController.setup();
-    pinMode(22, OUTPUT);
-    digitalWrite(22, HIGH);
+    OnOffController::setup();
 
     // Serial setup
-    Serial.begin(115200);
     //Serial.setDebugOutput(true);
+    Serial.begin(115200);
+    delay(100);
 
     statusLED.initialize();
     
-    delay(2000);
+    
 
     // Set LED state
     Serial.println("Setting state BOOT");
@@ -129,7 +128,6 @@ void setup() {
 // Main program lööp
 void loop() {
 
-    onOffController.loop();
     apiClient.loop();
     configButton.loop();
     userSettings.loop();

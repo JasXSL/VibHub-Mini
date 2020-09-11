@@ -34,7 +34,7 @@ namespace Configuration{
     const uint8_t PIN_MOTORS[NUM_MOTORS] = {13, 4};
     const uint8_t PIN_CONFIG_BUTTON = 26;   // Configuration pin. Use internal pullup
     const uint8_t PIN_POWEROFF      = 23;   // Writing LOW turns off
-    const uint8_t PIN_POWER_BUTTON  = 33;   // LOW when pressed. Has external pullup.
+    const uint8_t PIN_POWER_BUTTON  = 33;   // LOW when pressed. Use internal pullup.
     
 
     // PWM

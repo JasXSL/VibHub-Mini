@@ -10,13 +10,12 @@ class OnOffController {
     public:
         OnOffController(void);
         
-        void setup();
-        void loop();
+        static void setup();
+        static void IRAM_ATTR onInterrupt();
 
     private:
-        uint32_t time_released = 0;     // Time when it was first released, used for debounce
+        static uint32_t time_released;     // Time when it was first released, used for debounce
 };
 
-extern OnOffController onOffController;
 
 #endif //ConfigButton_h
