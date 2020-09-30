@@ -14,40 +14,48 @@
 
 OnOffController::OnOffController( void ){}
 
-uint32_t OnOffController::time_released = 0;
+bool OnOffController::isPowerReleased = false;
+const uint8_t OnOffController::POWER_STATE_HELD = 0;  // Waiting to release button
+const uint8_t OnOffController::POWER_STATE_RELEASED = 1;  // Power button was just released
+const uint8_t OnOffController::POWER_STATE_DONE = 2;  // Release has been triggered
 
 void IRAM_ATTR OnOffController::onInterrupt(){
 
-	const uint32_t ms = millis();
-	const bool pressed = digitalRead(Configuration::PIN_POWER_BUTTON) == Configuration::PWR_BUTTON_DOWN;
-	
-	if( !time_released ){
-
-		if( !pressed && ms > 500 )
-			time_released = ms;
-		
-		return;
-
-	}
-	// Turn off after 100ms debounce after releasing the button
-	if( pressed && ms-time_released > 1000 ){
-
-		detachInterrupt(digitalPinToInterrupt(Configuration::PIN_POWER_BUTTON));
-		digitalWrite(Configuration::PIN_POWEROFF, LOW);
-
-	}
-	
+	detachInterrupt(Configuration::PIN_POWER_BUTTON);
+	digitalWrite(Configuration::PIN_POWEROFF, LOW);
 
 }
 
+// Call first to keepalive
 void OnOffController::setup(){
 
     //set wifireset pin as input
     pinMode(Configuration::PIN_POWEROFF, OUTPUT);
 	digitalWrite(Configuration::PIN_POWEROFF, HIGH);
+	pinMode(Configuration::PIN_POWER_BUTTON, INPUT_PULLUP);
+	
 
-    pinMode(Configuration::PIN_POWER_BUTTON, INPUT_PULLUP);
-	attachInterrupt(digitalPinToInterrupt(Configuration::PIN_POWER_BUTTON), onInterrupt, CHANGE);
+}
+
+
+// Called after power button has been released, only triggered once
+uint8_t OnOffController::powerReleased(){
+
+	delay(10);
+	bool read = digitalRead(Configuration::PIN_POWER_BUTTON);
+	Serial.println(read);
+
+	if( isPowerReleased )
+		return POWER_STATE_DONE;
+
+	if( read == Configuration::PWR_BUTTON_UP ){
+		isPowerReleased = true;
+		delay(100);	// Debounce
+		attachInterrupt(Configuration::PIN_POWER_BUTTON, onInterrupt, FALLING);
+		return POWER_STATE_RELEASED;
+	}
+		
+	return POWER_STATE_HELD;
 
 }
 
