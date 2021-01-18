@@ -53,12 +53,12 @@ void ApiClient::connect(){
     Serial.printf("ApiClient::connect -> %s:%i\n", userSettings.server, userSettings.port);
     _running = true; // Start loop
     
-    if (userSettings.port == 443) {
+    if( userSettings.port == 443 ){
+
         Serial.println("Using SSL");
         _socket.beginSSL(userSettings.server, userSettings.port, Configuration::API_URL, Configuration::ROOTCA);
     }
-    else
-    {
+    else{
         _socket.begin(userSettings.server, userSettings.port, Configuration::API_URL);
     }
 }

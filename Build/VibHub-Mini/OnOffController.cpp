@@ -21,7 +21,10 @@ const uint8_t OnOffController::POWER_STATE_DONE = 2;  // Release has been trigge
 
 void IRAM_ATTR OnOffController::onInterrupt(){
 
+	
 	detachInterrupt(Configuration::PIN_POWER_BUTTON);
+	Serial.println("Die");
+	delay(10);
 	digitalWrite(Configuration::PIN_POWEROFF, LOW);
 
 }
@@ -43,16 +46,20 @@ uint8_t OnOffController::powerReleased(){
 
 	delay(10);
 	bool read = digitalRead(Configuration::PIN_POWER_BUTTON);
-	Serial.println(read);
+	//Serial.printf("OnOffController::powerReleased %i\n", read);
 
 	if( isPowerReleased )
 		return POWER_STATE_DONE;
 
 	if( read == Configuration::PWR_BUTTON_UP ){
+
+		Serial.println("OnOffController :: Released power button");
 		isPowerReleased = true;
 		delay(100);	// Debounce
 		attachInterrupt(Configuration::PIN_POWER_BUTTON, onInterrupt, FALLING);
+
 		return POWER_STATE_RELEASED;
+
 	}
 		
 	return POWER_STATE_HELD;

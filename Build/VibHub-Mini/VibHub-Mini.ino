@@ -86,13 +86,17 @@ void loop() {
 
     const uint8_t resetState = OnOffController::powerReleased();
     if( resetState == OnOffController::POWER_STATE_HELD ){
+        
         return;
+
     }
     
     if( resetState == OnOffController::POWER_STATE_RELEASED ){
+
         Serial.println("INIT");
         onPowerReleased();
         return;
+
     }
 
     apiClient.loop();
