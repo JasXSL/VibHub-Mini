@@ -32,6 +32,7 @@ void ApiClient::setup(){
     _socket.on("disconnect", std::bind(&ApiClient::event_disconnect, this, _1, _2));
     _socket.on("vib", std::bind(&ApiClient::event_vib, this, _1, _2));
     _socket.on("p", std::bind(&ApiClient::event_p, this, _1, _2));
+    _socket.on("ps", std::bind(&ApiClient::event_ps, this, _1, _2));
     _socket.on("ota", std::bind(&ApiClient::event_ota, this, _1, _2));
 
 	resetMotors();
@@ -209,6 +210,32 @@ void ApiClient::event_p( const char * payload, size_t length ){
     int i;
     for( i = 0; i < Configuration::NUM_MOTORS; ++i )
         setFlatPWM(i, vibArray[i]);
+
+}
+
+void ApiClient::event_ps( const char * payload, size_t length ){
+
+    Serial.printf("ApiClient::event_ps - %s length %i\n", payload, length);
+
+    // length seems to be off by 12 for some reason?
+    if( length > 12 )
+        length -= 12;
+
+    // Blocks of 4
+    for( size_t i = 0; i < length; i += 4 ){
+
+        char temp[5] = {payload[i], payload[i+1], payload[i+2], payload[i+3]};
+        uint32_t sub = strtoul(temp, 0, 16);
+        uint8_t chan = (sub>>8);
+        uint8_t intens = sub;       // Should work since it shaves off anything left of the first 8 bits
+        if( chan > Configuration::NUM_MOTORS )
+            continue;
+
+        Serial.printf("Updating chan %i with intens %i\n", chan, intens);
+        setFlatPWM(chan, intens);
+
+
+    }
 
 }
 
