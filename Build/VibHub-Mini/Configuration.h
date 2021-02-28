@@ -9,6 +9,25 @@
 #undef min
 #undef max
 
+#define CTASK_PWM_BASIC "p"                     // Capable of handling motor updates in one go
+#define CTASK_PWM_SPECIFIC "ps"                 // Capable of handling individual motor updates
+#define CTASK_PROGRAMS "vib"                    // Capable of handling programs
+#define CTASK_APP_OFFLINE "app_offline"         // Capable of doing something when app goes offline
+#define CTASK_CUSTOM_TO_DEVICE "dCustom"        // Capable of receiving custom data from the app
+#define CTASK_DEVICE_TO_CUSTOM "aCustom"        // Capable of sending custom data to the app
+
+
+class Capability{
+    public:
+        Capability( char* t, bool modded = false ){
+            type = t;
+            modified = modded;            
+        }
+        char *type;
+        bool modified;
+};
+
+
 namespace Configuration{
 
     const char VH_VERSION[]         = "m0.0.1";          // Software version
@@ -18,6 +37,13 @@ namespace Configuration{
     const int  DEFAULT_PORT         = 443;               // Default socket port
     const char API_URL[]            = "/socket.io/?transport=websocket";
     const char SETTINGS_FILE[]      = "/config.json";   // Default SPIFFS config file
+
+    const uint8_t NR_CAPABILITIES   = 3;
+    const Capability CAPABILITIES[NR_CAPABILITIES] = {
+        Capability(CTASK_PWM_BASIC),
+        Capability(CTASK_PWM_SPECIFIC),
+        Capability(CTASK_PROGRAMS)
+    };
 
     // Websockets
     const uint16_t WEBSOCKET_RECONNECT_TIME = 3000;          // How long to wait after a connection failed

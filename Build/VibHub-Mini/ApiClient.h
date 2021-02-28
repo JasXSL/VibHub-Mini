@@ -8,6 +8,7 @@
 #include <SocketIoClient.h>
 #include <functional>
 #include "Motor.h"
+#include "Configuration.h"
 
 using namespace std::placeholders;
 

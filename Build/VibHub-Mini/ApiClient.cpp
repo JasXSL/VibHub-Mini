@@ -78,7 +78,25 @@ void ApiClient::event_connect( const char * payload, size_t length ){
 	resetMotors();
     Serial.println("ApiClient::event_connect");
     _connected = true;
-    _socket.emit("id", ("\"" + (String)userSettings.deviceid + "\"").c_str());
+
+    StaticJsonDocument<512> doc;
+    doc["id"] = userSettings.deviceid;
+    doc["version"] = Configuration::VH_VERSION;
+    doc["hwversion"] = Configuration::VH_HWVERSION;
+    doc["numPorts"] = Configuration::NUM_MOTORS;
+
+    JsonObject capabilities = doc.createNestedObject("capabilities");
+    for( uint8_t i = 0; i < Configuration::NR_CAPABILITIES; ++i ){
+        if( Configuration::CAPABILITIES[i].modified )
+            capabilities[Configuration::CAPABILITIES[i].type] = "modified";
+        else
+            capabilities[Configuration::CAPABILITIES[i].type] = true;
+    }
+
+    String output;
+    serializeJson(doc, output);
+    Serial.printf("Initializing with: %s\n", output.c_str());
+    _socket.emit("id", output.c_str());
     statusLED.setState(StatusLED::STATE_RUNNING);
 
     // KC: Force test OTA
