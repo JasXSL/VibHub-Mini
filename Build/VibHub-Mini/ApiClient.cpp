@@ -143,7 +143,9 @@ void ApiClient::event_vib( const char * payload, size_t length ){
         //serializeJson(j, Serial);
         //Serial.println();
 
-        bool mo[Configuration::NUM_MOTORS] = {true};
+        bool mo[Configuration::NUM_MOTORS];
+        for( uint8_t n = 0; n < Configuration::NUM_MOTORS; ++n )
+            mo[n] = true;
         
         if( j.containsKey("port") ){
 
@@ -165,6 +167,7 @@ void ApiClient::event_vib( const char * payload, size_t length ){
 
             if( mo[n] )
                 motors[n].loadProgram(j["stages"], repeats);
+            
 
         }
 

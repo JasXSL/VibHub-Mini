@@ -49,7 +49,7 @@ void TweenProgram::generateStages(){
 	}
 	_totalTime = duration;
 	_started = millis();
-	Serial.printf("%i Program stages generated, free heap: %i \n", stages.size(), ESP.getFreeHeap());
+	//Serial.printf("%i Program stages generated, free heap: %i \n", stages.size(), ESP.getFreeHeap());
 	//Serial.printf("Program total duration %i, started %i \n", _totalTime, _started);
 
 }
