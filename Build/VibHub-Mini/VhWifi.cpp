@@ -12,6 +12,8 @@
 #include "UserSettings.h"
 #include <stdint.h> 
 
+void test(){}
+
 void VhWifi::connect( bool force, bool reset ){
 
     // Start the wifimanager
@@ -24,6 +26,7 @@ void VhWifi::connect( bool force, bool reset ){
     // Custom CSS shared among the whole site
     String head = FPSTR(CSS_SHARED);
     head += "<script>window.onload = () => {";
+        head += getCustomJSPre();
         head += FPSTR(JS_SHARED);
         head += getCustomJSPost();
     head += "};</script>";
@@ -59,7 +62,10 @@ void VhWifi::connect( bool force, bool reset ){
     //useful to make it all retry or go to sleep
     //in seconds
     //wifiManager.setConfigPortalTimeout(120);
+
     
+    wifiManager.setAjaxCallback(std::bind(&VhWifi::onAjax, this, _1));
+
     String ssid = Configuration::WIFI_SSID;
     if( force ){
 
@@ -94,12 +100,14 @@ void VhWifi::connect( bool force, bool reset ){
         //if( !wifiManager.autoConnect(ssid.c_str()) ){
         
         if( !connected ){
+
             Serial.println("VhWifi: Not connected. Starting config portal");
             if( !wifiManager.startConfigPortal(ssid.c_str()) ){
                 // Config mode failed to enter
                 Serial.println("VhWifi: Failed to connect and hit timeout");
                 handleFatalError();
             }
+
         }
 
     }
@@ -114,6 +122,23 @@ void VhWifi::connect( bool force, bool reset ){
         delay(1000);
     }
 
+
+}
+
+String VhWifi::onAjax( WiFiManager* wm ){
+
+    Serial.println( wm->server->method() == HTTP_GET  ? FPSTR(S_GET) : FPSTR(S_POST) );
+    String page = "";
+
+    String task = wm->server->arg(F("t")).c_str();
+    if( task == "id" || task == "ids" ){
+        
+        userSettings.generateDeviceId(task == "ids", true);
+        page = userSettings.deviceid;
+
+    }
+
+    return page;
 
 }
 
@@ -172,6 +197,13 @@ void VhWifi::configModeCallback( WiFiManager *myWiFiManager ){
 
 }
 
+String VhWifi::getCustomJSPre(){
+    String out;
+    out += "window.DEVID='";
+        out+= userSettings.deviceid;
+    out += "';";
+    return out;
+}
 
 String VhWifi::getCustomJSPost(){
 
@@ -183,12 +215,15 @@ String VhWifi::getCustomJSPost(){
         out+= "';";
     out+= "});";
 
+    
+    /*
     // Update with the DEVICE ID
     out+= "document.querySelectorAll('.VH_DEV_ID').forEach(el => {";
         out+="el.innerText='";
         out+= userSettings.deviceid;
         out+= "';";
     out+= "});";
+    */
     return out;
 		
 }
