@@ -103,9 +103,12 @@ void VhWifi::connect( bool force, bool reset ){
 
             Serial.println("VhWifi: Not connected. Starting config portal");
             if( !wifiManager.startConfigPortal(ssid.c_str()) ){
+                
                 // Config mode failed to enter
+                // Note that this happens also if you hit exit even while connected. Let the fatal error reset handler take care of it.
                 Serial.println("VhWifi: Failed to connect and hit timeout");
                 handleFatalError();
+
             }
 
         }
@@ -147,7 +150,7 @@ void VhWifi::handleFatalError(){
 
     statusLED.setState( StatusLED::STATE_WIFI_ERR );
     delay(5000);
-    esp_deep_sleep_start();
+    ESP.restart();
 
 }
 
