@@ -230,8 +230,6 @@ void ApiClient::event_ps( const char * payload, size_t length ){
         uint8_t intens = sub;       // Should work since it shaves off anything left of the first 8 bits
         if( chan > Configuration::NUM_MOTORS )
             continue;
-
-        Serial.printf("Updating chan %i with intens %i\n", chan, intens);
         setFlatPWM(chan, intens);
 
 

@@ -12,8 +12,6 @@
 #include "UserSettings.h"
 #include <stdint.h> 
 
-void test(){}
-
 void VhWifi::connect( bool force, bool reset ){
 
     // Start the wifimanager
